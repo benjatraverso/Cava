@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // Pins
 const unsigned int BTN_UP = 0; //DEFINIR!!!
 const unsigned int BTN_DOWN = 0; //DEFINIR!!!
@@ -25,9 +26,14 @@ int iTarget;
 
 float fInputTimer;
 unsigned long oldMicro;
+=======
+#include<Servo.h>
+#include<Wire.h>
+>>>>>>> origin/master
 
-void setup()
+enum States
 {
+<<<<<<< HEAD
 	pinMode(BTN_UP, INPUT_PULLUP);
 	pinMode(BTN_DOWN, INPUT_PULLUP);
 	
@@ -41,10 +47,15 @@ void setup()
 	
 	fInputTimer = 0;
 	oldMicro = micros();
+=======
+	Idle = 0,
+	WarmingUp
+>>>>>>> origin/master
 }
 
-void loop()
+setup()
 {
+<<<<<<< HEAD
 	float dt = getDeltaTime();
 	readInput();
 	switch (iState)
@@ -148,4 +159,22 @@ float getDeltaTime()
 		ul_dt = MAX_UL - oldMicro + newMicro;
 	}
 	return dt / 1000000.0f;
+=======
+	;
+>>>>>>> origin/master
+}
+
+loop()
+{
+	;
+}
+
+void GetNextStep()
+{
+	;
+}
+
+void DoStep()
+{
+	;
 }
