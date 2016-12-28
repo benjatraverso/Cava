@@ -13,6 +13,7 @@ const int STATE_TARGET = 3;
 const unsigned long MAX_UL = 4294967295;
 const float HOLD_DELAY = 1.0f;
 const float TARGET_DELAY = 3.0f;
+const float READ_TEMP_DELAY = 5.0f;
 
 // Variables
 int iState;
@@ -23,7 +24,10 @@ bool bDown;
 int iTemp;
 int iTarget;
 
+bool bDisplayCurrent;
+
 float fInputTimer;
+float fReadTempTimer;
 unsigned long oldMicro;
 
 void setup()
@@ -39,40 +43,46 @@ void setup()
 	iTemp = 0;
 	iTemp = 14; //guardar este dato si se apaga el micro???
 	
+	bDisplayCurrent = true;
+	
 	fInputTimer = 0;
+	fReadTempTimer = 0;
 	oldMicro = micros();
 }
 
 void loop()
 {
 	float dt = getDeltaTime();
+	updateCurrentTemp(dt);
 	readInput();
 	switch (iState)
 	{
 		case STATE_CURRENT:
-			if(bUp && !bDown)
+			if((bUp && !bDown) || (bDown && !bUp))
 			{
 				fInputTimer = 0;
-				// update display (switch to target temp)
-				state = STATE_UP;
-			}
-			else if(bDown && !bUp)
-			{
-				fInputTimer = 0;
-				// update display (switch to target temp)
-				state = STATE_DOWN;
+				bDisplayCurrent = false;
+				updateDisplay();
+				if(bUp)
+				{
+					iState = STATE_UP;
+				}
+				else
+				{
+					iState = STATE_DOWN;
+				}
 			}
 			break;
 		case STATE_UP:
 			if(bUp)
 			{
 				fInputTimer += dt;
-				if(fInputTimer >= HOLD_LENGTH)
+				if(fInputTimer >= HOLD_DELAY)
 				{
 					iTarget++;
 					// check max
-					// update display
-					fInputTimer -= HOLD_LENGTH;
+					updateDisplay();
+					fInputTimer -= HOLD_DELAY;
 				}
 			}
 			else
@@ -85,12 +95,12 @@ void loop()
 			if(bDown)
 			{
 				fInputTimer += dt;
-				if(fInputTimer >= HOLD_LENGTH)
+				if(fInputTimer >= HOLD_DELAY)
 				{
 					iTarget--;
 					// check min
-					// update display
-					fInputTimer -= HOLD_LENGTH;
+					updateDisplay();
+					fInputTimer -= HOLD_DELAY;
 				}
 			}
 			else
@@ -100,28 +110,30 @@ void loop()
 			}
 			break;
 		case STATE_TARGET:
-			if(bUp && !bDown)
+			if((bUp && !bDown) || (bDown && !bUp))
 			{
+				if(bUp)
+				{
+					iTarget++;
+					// check max
+					iState = STATE_UP;
+				}
+				else
+				{
+					iTarget--;
+					// check min
+					iState = STATE_DOWN;
+				}
 				fInputTimer = 0;
-				iTarget++;
-				// check max
-				// update display
-				state = STATE_UP;
-			}
-			else if(bDown && !bUp)
-			{
-				fInputTimer = 0;
-				iTarget--;
-				// check min
-				// update display
-				state = STATE_DOWN;
+				updateDisplay();
 			}
 			else
 			{
 				fInputTimer += dt;
 				if(fInputTimer >= TARGET_DELAY)
 				{
-					// update display (switch to current temp)
+					bDisplayCurrent = true;
+					updateDisplay();
 					iState = STATE_CURRENT;
 				}
 			}
@@ -133,6 +145,43 @@ void readInput()
 {
 	bUp = LOW == digitalRead(BTN_UP);
 	bDown = LOW == digitalRead(BTN_DOWN);
+}
+
+void updateCurrentTemp(float dt)
+{
+	fReadTempTimer += dt;
+	if(fReadTempTimer > READ_TEMP_DELAY)
+	{
+		fReadTempTimer -= READ_TEMP_DELAY;
+		iTemp = readTemperature();
+		if(STATE_CURRENT == iState)
+		{
+			updateDisplay();
+		}
+	}
+}
+
+int readTemperature()
+{
+	return 0; // DO SOMETHING :)
+}
+
+void updateDisplay()
+{
+	int dec = 0;
+	int uni = 0;
+	if(bDisplayCurrent)
+	{
+		dec = iTemp / 10;
+		uni = iTemp % 10;
+	}
+	else
+	{
+		dec = iTarget / 10;
+		uni = iTarget % 10;
+	}
+	// send dec to BCD 1
+	// send uni to BCD 2
 }
 
 float getDeltaTime()
@@ -147,5 +196,5 @@ float getDeltaTime()
 	{
 		ul_dt = MAX_UL - oldMicro + newMicro;
 	}
-	return dt / 1000000.0f;
+	return (float)ul_dt / 1000000.0f;
 }
