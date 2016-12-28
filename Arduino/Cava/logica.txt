@@ -1,0 +1,6 @@
+mientras no se apreta ningun boton, se muestra la temperatura actual
+si se apretan ambos botones al mismo tiempo es como no apretar nada
+cuando se aprieta un boton cualquiera, pasa a mostrarse la tempratura deseada
+mientras se mantiene apretado un boton, la temperatura deseada sube o baja 1°C(?) cada 1 segundo (timer hold).
+si se suelta el boton apretado, se resetea el timer de hold (para que pueda subir/bajar mas rapido haciendo repetidos clicks)
+despues de soltar todos los botones, se sigue mostrando la temperatura deseada por 3 segundos y luego se vuelve a mostrar la actual
