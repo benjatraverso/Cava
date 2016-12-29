@@ -1,22 +1,14 @@
-// Pins
-// DEFINIR TODO!!!!!!!!!!!!!!!
-// DEFINIR TODO!!!!!!!!!!!!!!!
-// DEFINIR TODO!!!!!!!!!!!!!!!
-// DEFINIR TODO!!!!!!!!!!!!!!!
-const unsigned int BTN_UP = 0;
-const unsigned int BTN_DOWN = 0;
-const unsigned int BCD_DEC_A = 0;
-const unsigned int BCD_DEC_B = 0;
-const unsigned int BCD_DEC_C = 0;
-const unsigned int BCD_DEC_D = 0;
-const unsigned int BCD_UNI_A = 0;
-const unsigned int BCD_UNI_B = 0;
-const unsigned int BCD_UNI_C = 0;
-const unsigned int BCD_UNI_D = 0;
-// DEFINIR TODO!!!!!!!!!!!!!!!
-// DEFINIR TODO!!!!!!!!!!!!!!!
-// DEFINIR TODO!!!!!!!!!!!!!!!
-// DEFINIR TODO!!!!!!!!!!!!!!!
+// I/O Pins
+const unsigned int BTN_UP = 24;
+const unsigned int BTN_DOWN = 23;
+const unsigned int BCD_DEC_A = 4;
+const unsigned int BCD_DEC_B = 5;
+const unsigned int BCD_DEC_C = 6;
+const unsigned int BCD_DEC_D = 13;
+const unsigned int BCD_UNI_A = 19;
+const unsigned int BCD_UNI_B = 18;
+const unsigned int BCD_UNI_C = 16;
+const unsigned int BCD_UNI_D = 15;
 
 // State Constants
 enum EInputState
