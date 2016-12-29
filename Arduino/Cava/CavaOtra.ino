@@ -92,9 +92,8 @@ void DoStep( void )
 			ChangingDesiredTemp();
 			break;
 		}
-		case STATE_TARGET:
+		default:
 		{
-
 			break;
 		}
 	}
@@ -109,18 +108,16 @@ void ChangingDesiredTemp( void )
 		if(gbUp && giTargetTemp < MAX_TEMP )
 		{
 			gbUp = false;
-			giTargetTemp ++;
 			ResetTime();
+			updateDisplay(++giTargetTemp);
 		}
 
 		if(gbDown && giTargetTemp > MIN_TEMP )
 		{
 			gbDown = false;
-			giTargetTemp--;
 			ResetTime();
+			updateDisplay(--giTargetTemp);
 		}
-
-		updateDisplay(giTargetTemp);
 	}
 }
 
@@ -128,6 +125,8 @@ void Idle( void )
 {
 	while(!gbUp && !gbDown)
 	{
+		//control temp modifies PWM on petriel depending
+		//on difference in between desired temp and actual
 		ControlTemp();
 		readInput();
 	}
@@ -158,10 +157,11 @@ int readTemperature()
 	return 0; // DO SOMETHING :)
 }
 
-void updateDisplay()
+void updateDisplay( int iTemp )
 {
 	int dec = 0;
 	int uni = 0;
+
 	if(bDisplayCurrent)
 	{
 		dec = iTemp / 10;
@@ -176,10 +176,11 @@ void updateDisplay()
 	// send uni to BCD 2
 }
 
-float getDeltaTime()
+bool OutOfTime( void )
 {
-	unsigned long newMicro = micros();
-	unsigned long ul_dt = 0;
+	//unsigned long newMicro = micros();
+	//unsigned long ul_dt = 0;
+
 	if(newMicro > oldMicro)
 	{
 		ul_dt = newMicro - oldMicro;
