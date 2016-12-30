@@ -1,10 +1,10 @@
 // I/O Pins
 const unsigned int BTN_UP = 24;
 const unsigned int BTN_DOWN = 23;
-const unsigned int BCD_DEC_A = 4;
-const unsigned int BCD_DEC_B = 5;
-const unsigned int BCD_DEC_C = 6;
-const unsigned int BCD_DEC_D = 13;
+const unsigned int BCD_TEN_A = 4;
+const unsigned int BCD_TEN_B = 5;
+const unsigned int BCD_TEN_C = 6;
+const unsigned int BCD_TEN_D = 13;
 const unsigned int BCD_UNI_A = 19;
 const unsigned int BCD_UNI_B = 18;
 const unsigned int BCD_UNI_C = 16;
@@ -22,8 +22,8 @@ const unsigned long MAX_UL = 4294967295;
 const float HOLD_DELAY = 1.0f;
 const float TARGET_DELAY = 3.0f;
 const float READ_TEMP_DELAY = 5.0f;
-const int TARGET_MAX = 25;
-const int TARGET_MIN = 0;
+const int TARGET_MAX = 20;
+const int TARGET_MIN = 5;
 
 // Variables
 EInputState eInputState;
@@ -47,7 +47,7 @@ void setup()
 	setupIO();
 	
 	eInputState = EIS_IDLE;
-	
+  
 	bUp = false;
 	bDown = false;
 	
@@ -68,19 +68,19 @@ void setupIO()
 	pinMode(BTN_UP, INPUT_PULLUP);
 	pinMode(BTN_DOWN, INPUT_PULLUP);
 	
-	pinMode(BCD_DEC_A, OUTPUT);
-	pinMode(BCD_DEC_B, OUTPUT);
-	pinMode(BCD_DEC_C, OUTPUT);
-	pinMode(BCD_DEC_D, OUTPUT);
+	pinMode(BCD_TEN_A, OUTPUT);
+	pinMode(BCD_TEN_B, OUTPUT);
+	pinMode(BCD_TEN_C, OUTPUT);
+	pinMode(BCD_TEN_D, OUTPUT);
 	pinMode(BCD_UNI_A, OUTPUT);
 	pinMode(BCD_UNI_B, OUTPUT);
 	pinMode(BCD_UNI_C, OUTPUT);
 	pinMode(BCD_UNI_D, OUTPUT);
 	
-	digitalWrite(BCD_DEC_A, LOW);
-	digitalWrite(BCD_DEC_B, LOW);
-	digitalWrite(BCD_DEC_C, LOW);
-	digitalWrite(BCD_DEC_D, LOW);
+	digitalWrite(BCD_TEN_A, LOW);
+	digitalWrite(BCD_TEN_B, LOW);
+	digitalWrite(BCD_TEN_C, LOW);
+	digitalWrite(BCD_TEN_D, LOW);
 	digitalWrite(BCD_UNI_A, LOW);
 	digitalWrite(BCD_UNI_B, LOW);
 	digitalWrite(BCD_UNI_C, LOW);
@@ -216,21 +216,48 @@ void loopDisplay()
 {
 	if(bUpdateDisplay)
 	{
-		int dec = 0;
-		int uni = 0;
 		if(bDisplayCurrent)
 		{
-			dec = iTemp / 10;
-			uni = iTemp % 10;
+			setDisplay(iTemp);
 		}
 		else
 		{
-			dec = iTarget / 10;
-			uni = iTarget % 10;
+			setDisplay(iTarget);
 		}
-		outputIntToBcd(dec, BCD_DEC_A, BCD_DEC_B, BCD_DEC_C, BCD_DEC_D);
-		outputIntToBcd(uni, BCD_UNI_A, BCD_UNI_B, BCD_UNI_C, BCD_UNI_D);
 	}
+}
+
+void setDisplay(int num)
+{
+	int ten = 0;
+	int uni = 0;
+	if(num > 25)
+	{
+		ten = 11;
+		uni = 11;
+	}
+	else if(num < 0)
+	{
+		ten = 12;
+		uni = 12;
+	}
+	else
+	{
+		ten = num / 10;
+		if(0 == ten)
+		{
+			ten = 15;
+		}
+		uni = num % 10;
+	}
+	outputIntToBcd(ten, BCD_TEN_A, BCD_TEN_B, BCD_TEN_C, BCD_TEN_D);
+	outputIntToBcd(uni, BCD_UNI_A, BCD_UNI_B, BCD_UNI_C, BCD_UNI_D);
+}
+
+void setDisplay(char c1, char c2)
+{
+	outputIntToBcd((int)c1, BCD_TEN_A, BCD_TEN_B, BCD_TEN_C, BCD_TEN_D);
+	outputIntToBcd((int)c2, BCD_UNI_A, BCD_UNI_B, BCD_UNI_C, BCD_UNI_D);
 }
 
 void outputIntToBcd(int digit, int pinA, int pinB, int pinC, int pinD)
