@@ -138,6 +138,11 @@ void loopUserInput(float dt)
 	}
 }
 
+/**************************************************
+** Function tested and workking fine on 01/01/17
+** re-test if anything is changed
+** find test file at Cava\Arduino\Testing\Buttons
+**************************************************/
 void readInput()
 {
 	bUp = LOW == digitalRead(BTN_UP);
