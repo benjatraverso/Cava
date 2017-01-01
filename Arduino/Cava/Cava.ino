@@ -44,11 +44,11 @@ unsigned long ulLastTime;
 
 void setup()
 {
-  Serial.begin(9600);
+	Serial.begin(9600);
 	setupIO();
 	
 	eInputState = EIS_IDLE;
-  
+	
 	bUp = false;
 	bDown = false;
 	
@@ -90,8 +90,8 @@ void setupIO()
 
 void loop()
 {
-  Serial.print("State: ");
-  Serial.println(eInputState);
+	Serial.print("State: ");
+	Serial.println(eInputState);
 	float dt = getDeltaTime();
 	loopTempControl(dt);
 	loopUserInput(dt);
@@ -224,7 +224,8 @@ void loopDisplay()
 {
 	if(bUpdateDisplay)
 	{
-    Serial.println("updating display");
+		bUpdateDisplay = false;
+		Serial.println("updating display");
 		if(bDisplayCurrent)
 		{
 			setDisplay(iTemp);
