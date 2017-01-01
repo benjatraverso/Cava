@@ -1,6 +1,6 @@
 // I/O Pins
-const unsigned int BTN_UP = A1;
-const unsigned int BTN_DOWN = A0;
+const unsigned int BTN_UP = 15;
+const unsigned int BTN_DOWN = 14;
 const unsigned int BCD_TEN_A = 2;
 const unsigned int BCD_TEN_B = 3;
 const unsigned int BCD_TEN_C = 4;
@@ -148,8 +148,8 @@ void loopUserInput(float dt)
 **************************************************/
 void readInput()
 {
-	bUp = LOW == digitalRead(BTN_UP);
-	bDown = LOW == digitalRead(BTN_DOWN);
+  bUp = HIGH == digitalRead(BTN_UP);
+  bDown = HIGH == digitalRead(BTN_DOWN);
 }
 
 void stateUserInputIdle(float dt)
