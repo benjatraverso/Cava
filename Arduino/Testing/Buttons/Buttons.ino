@@ -10,58 +10,18 @@ const unsigned int BCD_UNI_B = 12;
 const unsigned int BCD_UNI_C = 10;
 const unsigned int BCD_UNI_D = 9;
 
-// State Constants
-enum EInputState
-{
-  EIS_IDLE = 0,
-  EIS_CHANGE
-};
-
-// Other Constants
-const unsigned long MAX_UL = 4294967295;
-const float HOLD_DELAY = 1.0f;
-const float TARGET_DELAY = 3.0f;
-const float READ_TEMP_DELAY = 5.0f;
-const int TARGET_MAX = 20;
-const int TARGET_MIN = 5;
-
-// Variables
-EInputState eInputState;
-
 bool bUp;
 bool bDown;
 
-int iTemp;
-int iTarget;
-int iNextTarget;
-
-bool bDisplayCurrent;
-bool bUpdateDisplay;
-
-float fReadTempTimer;
-float fInputTimer;
-unsigned long ulLastTime;
+int iTemp = 14;
 
 void setup()
 {
   Serial.begin(9600);
   setupIO();
   
-  eInputState = EIS_IDLE;
-  
   bUp = false;
   bDown = false;
-  
-  iTemp = 0;
-  iTarget = 14; //guardar este dato si se apaga el micro???
-  iNextTarget = iTarget;
-  
-  bDisplayCurrent = true;
-  bUpdateDisplay = true;
-  
-  fReadTempTimer = 0;
-  fInputTimer = 0;
-  ulLastTime = millis();
 }
 
 void setupIO()
@@ -90,151 +50,30 @@ void setupIO()
 
 void loop()
 {
-  Serial.print("State: ");
-  Serial.println(eInputState);
-  float dt = getDeltaTime();
-  loopTempControl(dt);
-  loopUserInput(dt);
-  loopDisplay();
-  delay(300);
-}
-
-/////////////////////////
-// TEMPERATURE CONTROL //
-/////////////////////////
-
-void loopTempControl(float dt)
-{
-  fReadTempTimer += dt;
-  if(fReadTempTimer > READ_TEMP_DELAY)
-  {
-    fReadTempTimer = 0;
-    //iTemp = readTemperature();
-    if(bDisplayCurrent)
-    {
-      bUpdateDisplay = true;
-    }
-    
-    // Compare temperature with target and do something about it!!!
-  }
-}
-
-int readTemperature()
-{
-  return 0; // DO SOMETHING :)
-}
-
-///////////////////////
-// HANDLE USER INPUT //
-///////////////////////
-
-void loopUserInput(float dt)
-{
   readInput();
-  switch (eInputState)
+  if(bUp)
   {
-    case EIS_IDLE:
-      stateUserInputIdle(dt);
-      break;
-    case EIS_CHANGE:
-      stateUserInputChange(dt);
-      break;
+    Serial.println("up");
+    iTemp++;
+    setDisplay(iTemp);
   }
+  if(bDown)
+  {
+    Serial.println("down");
+    iTemp--;
+    setDisplay(iTemp);
+  }
+  delay(500);
+  
+  bUp = false;
+  bDown = false;
+  Serial.println(iTemp);
 }
 
 void readInput()
 {
   bUp = HIGH == digitalRead(BTN_UP);
   bDown = HIGH == digitalRead(BTN_DOWN);
-}
-
-void stateUserInputIdle(float dt)
-{
-  if(bUp || bDown)
-  {
-    fInputTimer = 0;
-    eInputState = EIS_CHANGE;
-    if(bDisplayCurrent)
-    {
-      bDisplayCurrent = false;
-    }
-    else
-    {
-      if(bUp)
-      {
-        Serial.println("button up pressed");
-        iNextTarget = min(iTarget + 1, TARGET_MAX);
-      }
-      else
-      {
-        Serial.println("button up pressed");
-        iNextTarget = max(iTarget - 1, TARGET_MIN);
-      }
-    }
-    bUpdateDisplay = true;
-  }
-  else
-  {
-    if(!bDisplayCurrent)
-    {
-      fInputTimer += dt;
-      if(fInputTimer >= TARGET_DELAY)
-      {
-        iTarget = iNextTarget;
-        bDisplayCurrent = true;
-        bUpdateDisplay = true;
-      }
-    }
-  }
-}
-
-void stateUserInputChange(float dt)
-{
-  if(bUp || bDown)
-  {
-    fInputTimer += dt;
-    if(fInputTimer >= HOLD_DELAY)
-    {
-      if(bUp)
-      {
-        iNextTarget = min(iTarget + 1, TARGET_MAX);
-      }
-      else
-      {
-        iNextTarget = max(iTarget - 1, TARGET_MIN);
-      }
-      bUpdateDisplay = true;
-      fInputTimer = 0;
-    }
-  }
-  else
-  {
-    fInputTimer = 0;
-    eInputState = EIS_IDLE;
-  }
-}
-
-/////////////
-// DISPLAY //
-/////////////
-
-void loopDisplay()
-{
-  if(bUpdateDisplay)
-  {
-    Serial.println("updating display");
-    if(bDisplayCurrent)
-    {
-      //no current, just turn off
-      outputIntToBcd(15, BCD_TEN_A, BCD_TEN_B, BCD_TEN_C, BCD_TEN_D);
-      outputIntToBcd(15, BCD_UNI_A, BCD_UNI_B, BCD_UNI_C, BCD_UNI_D);
-    }
-    else
-    {
-      Serial.println(iTarget);
-      setDisplay(iTarget);
-    }
-  }
 }
 
 /**************************************************
@@ -271,16 +110,11 @@ void setDisplay(int num)
   }
   outputIntToBcd(ten, BCD_TEN_A, BCD_TEN_B, BCD_TEN_C, BCD_TEN_D);
   outputIntToBcd(uni, BCD_UNI_A, BCD_UNI_B, BCD_UNI_C, BCD_UNI_D);
-
-  bUpdateDisplay = false;
 }
 
-void setDisplay(char c1, char c2)
-{
-  outputIntToBcd((int)c1, BCD_TEN_A, BCD_TEN_B, BCD_TEN_C, BCD_TEN_D);
-  outputIntToBcd((int)c2, BCD_UNI_A, BCD_UNI_B, BCD_UNI_C, BCD_UNI_D);
-}
-
+/*****************************************************
+** Tested along with setDisplay, re-test if changed
+*****************************************************/
 void outputIntToBcd(int digit, int pinA, int pinB, int pinC, int pinD)
 {
   digitalWrite(pinA, 1 == bitRead(digit, 0) ? HIGH : LOW);
@@ -288,23 +122,3 @@ void outputIntToBcd(int digit, int pinA, int pinB, int pinC, int pinD)
   digitalWrite(pinC, 1 == bitRead(digit, 2) ? HIGH : LOW);
   digitalWrite(pinD, 1 == bitRead(digit, 3) ? HIGH : LOW);
 }
-
-///////////
-// UTILS //
-///////////
-
-float getDeltaTime()
-{
-  unsigned long ulNewTime = millis();
-  unsigned long ul_dt = 0;
-  if(ulNewTime > ulLastTime)
-  {
-    ul_dt = ulNewTime - ulLastTime;
-  }
-  else
-  {
-    ul_dt = MAX_UL - ulLastTime + ulNewTime;
-  }
-  return (float)ul_dt / 1000.0f;
-}
-
