@@ -62,7 +62,7 @@ void setup()
 	
 	fReadTempTimer = 0;
 	fInputTimer = 0;
-	ulLastTime = millis();
+	ulLastTime = micros();
 }
 
 void setupIO()
@@ -91,8 +91,8 @@ void setupIO()
 
 void loop()
 {
-	Serial.print("State: ");
-	Serial.println(eInputState);
+	//Serial.print("State: ");
+	//Serial.println(eInputState);
 	float dt = getDeltaTime();
 	loopTempControl(dt);
 	loopUserInput(dt);
@@ -149,8 +149,8 @@ void loopUserInput(float dt)
 **************************************************/
 void readInput()
 {
-  bUp = LOW == digitalRead(BTN_UP);
-  bDown = LOW == digitalRead(BTN_DOWN);
+	bUp = LOW == digitalRead(BTN_UP);
+	bDown = LOW == digitalRead(BTN_DOWN);
 }
 
 void stateUserInputIdle(float dt)
@@ -159,7 +159,7 @@ void stateUserInputIdle(float dt)
 	{
 		fInputTimer = 0;
 		eInputState = EIS_CHANGE;
-		Serial.print("GO TO CHANGE\n\r");
+		Serial.println("GO TO CHANGE");
 		if(bDisplayCurrent)
 		{
 			bDisplayCurrent = false;
@@ -168,12 +168,12 @@ void stateUserInputIdle(float dt)
 		{
 			if(bUp)
 			{
-				Serial.print("+1 FROM IDLE\n\r");
+				Serial.println("+1 FROM IDLE");
 				iNextTarget = min(iTarget + 1, TARGET_MAX);
 			}
 			else
 			{
-				Serial.print("-1 FROM IDLE\n\r");
+				Serial.println("-1 FROM IDLE");
 				iNextTarget = max(iTarget - 1, TARGET_MIN);
 			}
 		}
@@ -184,11 +184,11 @@ void stateUserInputIdle(float dt)
 		if(!bDisplayCurrent)
 		{
 			fInputTimer += dt;
-			Serial.print("fInputTimer (to show current): ");
-			Serial.print(fInputTimer);
+			//Serial.print("fInputTimer (to show current): ");
+			//Serial.println(fInputTimer);
 			if(fInputTimer >= TARGET_DELAY)
 			{
-				Serial.print("SHOW CURRENT\n\r");
+				Serial.println("SHOW CURRENT");
 				iTarget = iNextTarget;
 				bDisplayCurrent = true;
 				bUpdateDisplay = true;
@@ -202,18 +202,18 @@ void stateUserInputChange(float dt)
 	if(bUp || bDown)
 	{
 		fInputTimer += dt;
-		Serial.print("fInputTimer (to keep change): ");
-		Serial.print(fInputTimer);
+		//Serial.print("fInputTimer (to keep change): ");
+		//Serial.println(fInputTimer);
 		if(fInputTimer >= HOLD_DELAY)
 		{
 			if(bUp)
 			{
-				Serial.print("+1 DUE TO HOLD\n\r");
+				Serial.println("+1 DUE TO HOLD");
 				iNextTarget = min(iTarget + 1, TARGET_MAX);
 			}
 			else
 			{
-				Serial.print("-1 DUE TO HOLD\n\r");
+				Serial.println("-1 DUE TO HOLD");
 				iNextTarget = max(iTarget - 1, TARGET_MIN);
 			}
 			bUpdateDisplay = true;
@@ -222,7 +222,7 @@ void stateUserInputChange(float dt)
 	}
 	else
 	{
-		Serial.print("GO TO IDLE\n\r");
+		Serial.println("GO TO IDLE");
 		fInputTimer = 0;
 		eInputState = EIS_IDLE;
 	}
@@ -308,7 +308,7 @@ void outputIntToBcd(int digit, int pinA, int pinB, int pinC, int pinD)
 
 float getDeltaTime()
 {
-	unsigned long ulNewTime = millis();
+	unsigned long ulNewTime = micros();
 	unsigned long ul_dt = 0;
 	if(ulNewTime > ulLastTime)
 	{
@@ -318,9 +318,9 @@ float getDeltaTime()
 	{
 		ul_dt = MAX_UL - ulLastTime + ulNewTime;
 	}
-	float f_dt_sec = (float)ul_dt / 1000.0f;
-	Serial.print("Delta time: ");
-	Serial.print(f_dt_sec);
+	float f_dt_sec = (float)ul_dt / 1000000.0f;
+	//Serial.print("Delta time: ");
+	//Serial.println(f_dt_sec);
 	ulLastTime = ulNewTime;
 	return f_dt_sec;
 }
