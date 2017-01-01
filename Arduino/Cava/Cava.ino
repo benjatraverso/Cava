@@ -269,6 +269,9 @@ void setDisplay(char c1, char c2)
 	outputIntToBcd((int)c2, BCD_UNI_A, BCD_UNI_B, BCD_UNI_C, BCD_UNI_D);
 }
 
+/*
+** Tested along with setDisplay, re-test if changed
+*/
 void outputIntToBcd(int digit, int pinA, int pinB, int pinC, int pinD)
 {
 	digitalWrite(pinA, 1 == bitRead(digit, 0) ? HIGH : LOW);
