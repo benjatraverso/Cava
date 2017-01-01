@@ -1,14 +1,14 @@
 // I/O Pins
-const unsigned int BTN_UP = 24;
-const unsigned int BTN_DOWN = 23;
-const unsigned int BCD_TEN_A = 4;
-const unsigned int BCD_TEN_B = 5;
-const unsigned int BCD_TEN_C = 6;
-const unsigned int BCD_TEN_D = 13;
-const unsigned int BCD_UNI_A = 19;
-const unsigned int BCD_UNI_B = 18;
-const unsigned int BCD_UNI_C = 16;
-const unsigned int BCD_UNI_D = 15;
+const unsigned int BTN_UP = A1;
+const unsigned int BTN_DOWN = A0;
+const unsigned int BCD_TEN_A = 2;
+const unsigned int BCD_TEN_B = 3;
+const unsigned int BCD_TEN_C = 4;
+const unsigned int BCD_TEN_D = 7;
+const unsigned int BCD_UNI_A = 13;
+const unsigned int BCD_UNI_B = 12;
+const unsigned int BCD_UNI_C = 10;
+const unsigned int BCD_UNI_D = 9;
 
 // State Constants
 enum EInputState
@@ -227,10 +227,19 @@ void loopDisplay()
 	}
 }
 
+/**************************************************
+** Function tested and workking fine on 01/01/17
+** re-test if anything is changed
+** find test file at Cava\Arduino\Testing\Display
+**************************************************/
 void setDisplay(int num)
 {
 	int ten = 0;
 	int uni = 0;
+
+	// TODO: what do we do when current temperature is outside this ranges?
+	// user plugs device at -5º -> display is unreadable -> user returns 
+	// malfunctioning device
 	if(num > 25)
 	{
 		ten = 11;
