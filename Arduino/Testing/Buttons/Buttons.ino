@@ -1,6 +1,6 @@
 // I/O Pins
-const unsigned int BTN_UP = 6;
-const unsigned int BTN_DOWN = 8;
+const unsigned int BTN_UP = 15;
+const unsigned int BTN_DOWN = 14;
 const unsigned int BCD_TEN_A = 2;
 const unsigned int BCD_TEN_B = 3;
 const unsigned int BCD_TEN_C = 4;
