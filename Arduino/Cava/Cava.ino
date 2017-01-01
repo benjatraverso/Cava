@@ -45,6 +45,7 @@ unsigned long ulLastTime;
 void setup()
 {
 	Serial.begin(9600);
+	
 	setupIO();
 	
 	eInputState = EIS_IDLE;
@@ -148,8 +149,8 @@ void loopUserInput(float dt)
 **************************************************/
 void readInput()
 {
-  bUp = HIGH == digitalRead(BTN_UP);
-  bDown = HIGH == digitalRead(BTN_DOWN);
+  bUp = LOW == digitalRead(BTN_UP);
+  bDown = LOW == digitalRead(BTN_DOWN);
 }
 
 void stateUserInputIdle(float dt)
@@ -158,6 +159,7 @@ void stateUserInputIdle(float dt)
 	{
 		fInputTimer = 0;
 		eInputState = EIS_CHANGE;
+		Serial.print("GO TO CHANGE\n\r");
 		if(bDisplayCurrent)
 		{
 			bDisplayCurrent = false;
@@ -166,10 +168,12 @@ void stateUserInputIdle(float dt)
 		{
 			if(bUp)
 			{
+				Serial.print("+1 FROM IDLE\n\r");
 				iNextTarget = min(iTarget + 1, TARGET_MAX);
 			}
 			else
 			{
+				Serial.print("-1 FROM IDLE\n\r");
 				iNextTarget = max(iTarget - 1, TARGET_MIN);
 			}
 		}
@@ -180,8 +184,11 @@ void stateUserInputIdle(float dt)
 		if(!bDisplayCurrent)
 		{
 			fInputTimer += dt;
+			Serial.print("fInputTimer (to show current): ");
+			Serial.print(fInputTimer);
 			if(fInputTimer >= TARGET_DELAY)
 			{
+				Serial.print("SHOW CURRENT\n\r");
 				iTarget = iNextTarget;
 				bDisplayCurrent = true;
 				bUpdateDisplay = true;
@@ -195,14 +202,18 @@ void stateUserInputChange(float dt)
 	if(bUp || bDown)
 	{
 		fInputTimer += dt;
+		Serial.print("fInputTimer (to keep change): ");
+		Serial.print(fInputTimer);
 		if(fInputTimer >= HOLD_DELAY)
 		{
 			if(bUp)
 			{
+				Serial.print("+1 DUE TO HOLD\n\r");
 				iNextTarget = min(iTarget + 1, TARGET_MAX);
 			}
 			else
 			{
+				Serial.print("-1 DUE TO HOLD\n\r");
 				iNextTarget = max(iTarget - 1, TARGET_MIN);
 			}
 			bUpdateDisplay = true;
@@ -211,6 +222,7 @@ void stateUserInputChange(float dt)
 	}
 	else
 	{
+		Serial.print("GO TO IDLE\n\r");
 		fInputTimer = 0;
 		eInputState = EIS_IDLE;
 	}
@@ -225,7 +237,7 @@ void loopDisplay()
 	if(bUpdateDisplay)
 	{
 		bUpdateDisplay = false;
-		Serial.println("updating display");
+		Serial.println("Updating display");
 		if(bDisplayCurrent)
 		{
 			setDisplay(iTemp);
@@ -306,5 +318,9 @@ float getDeltaTime()
 	{
 		ul_dt = MAX_UL - ulLastTime + ulNewTime;
 	}
-	return (float)ul_dt / 1000.0f;
+	float f_dt_sec = (float)ul_dt / 1000.0f;
+	Serial.print("Delta time: ");
+	Serial.print(f_dt_sec);
+	ulLastTime = ulNewTime;
+	return f_dt_sec;
 }
