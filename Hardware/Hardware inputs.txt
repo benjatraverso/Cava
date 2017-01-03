@@ -1,0 +1,11 @@
+Peltier cell:
+Cold mode:
+0Vdc - 0~12Vdc
+Heat mode:
+0~12Vdc - 0Vdc
+
+Inside fan:
+Always on.
+
+Outside fan:
+Always on.

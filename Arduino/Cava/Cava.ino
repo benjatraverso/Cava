@@ -209,12 +209,12 @@ void stateUserInputChange(float dt)
 			if(bUp)
 			{
 				Serial.println("+1 DUE TO HOLD");
-				iNextTarget = min(iTarget + 1, TARGET_MAX);
+				iNextTarget = min(iNextTarget + 1, TARGET_MAX);
 			}
 			else
 			{
 				Serial.println("-1 DUE TO HOLD");
-				iNextTarget = max(iTarget - 1, TARGET_MIN);
+				iNextTarget = max(iNextTarget - 1, TARGET_MIN);
 			}
 			bUpdateDisplay = true;
 			fInputTimer = 0;
@@ -244,7 +244,7 @@ void loopDisplay()
 		}
 		else
 		{
-			setDisplay(iTarget);
+			setDisplay(iNextTarget);
 		}
 	}
 }
