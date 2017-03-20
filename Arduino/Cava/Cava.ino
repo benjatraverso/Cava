@@ -169,12 +169,12 @@ void stateUserInputIdle(float dt)
 			if(bUp)
 			{
 				Serial.println("+1 FROM IDLE");
-				iNextTarget = min(iTarget + 1, TARGET_MAX);
+				iNextTarget = min(iNextTarget + 1, TARGET_MAX);
 			}
 			else
 			{
 				Serial.println("-1 FROM IDLE");
-				iNextTarget = max(iTarget - 1, TARGET_MIN);
+				iNextTarget = max(iNextTarget - 1, TARGET_MIN);
 			}
 		}
 		bUpdateDisplay = true;
